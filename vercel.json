@@ -1,3 +1,5 @@
 {
-  "rootDirectory": "apps/web"
+  "installCommand": "npm install --prefix apps/web",
+  "buildCommand": "cd apps/web && node_modules/.bin/next build",
+  "outputDirectory": "apps/web/.next"
 }
