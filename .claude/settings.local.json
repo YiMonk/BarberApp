@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(supabase link *)",
+      "Bash(npm list *)",
+      "Bash(npm install *)",
+      "Bash(scoop *)",
+      "Bash(supabase db *)",
+      "Bash(psql *)",
+      "PowerShell(Test-NetConnection *)",
+      "Bash(node -e ' *)",
+      "Bash(SUPABASE_DB_PASSWORD=\"Contrase123!1\" supabase db *)",
+      "Bash(New-Item *)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\YiMonk\\\\Desktop\\\\ServiceApp\" | Select-Object Name, @{Name=\"Type\"; Expression={if \\($_.PSIsContainer\\) { \"DIR\" } else { \"FILE\" }}})",
+      "Bash(npx create-next-app@latest web --typescript --tailwind --app --no-git --eslint --import-alias '@/*' --src-dir=false)",
+      "Bash(npx shadcn-ui@latest *)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(pnpm install *)",
+      "Bash(timeout 15 pnpm dev)",
+      "Bash(npm run *)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(npx tsc *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s http://localhost:3000/registro)",
+      "PowerShell(Stop-Process *)",
+      "Bash(curl -s -w \"\\\\n%{http_code}\\\\n\" http://localhost:3000)"
+    ]
+  }
+}
