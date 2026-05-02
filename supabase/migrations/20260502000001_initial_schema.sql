@@ -48,8 +48,8 @@ create table public.provider_accounts (
   updated_at timestamptz not null default now()
 );
 
-create index idx_provider_accounts_auth_user on public.provider_accounts(auth_user_id);
-create index idx_provider_accounts_active on public.provider_accounts(is_active) where is_active = true;
+CREATE INDEX IF NOT EXISTS idx_provider_accounts_auth_user on public.provider_accounts(auth_user_id);
+CREATE INDEX IF NOT EXISTS idx_provider_accounts_active on public.provider_accounts(is_active) where is_active = true;
 
 -- Suscripciones: el corazón del control de acceso.
 -- Una por cada provider_account.
@@ -78,8 +78,8 @@ create table public.subscriptions (
   updated_at timestamptz not null default now()
 );
 
-create index idx_subscriptions_status on public.subscriptions(status);
-create index idx_subscriptions_period_end on public.subscriptions(current_period_end);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_status on public.subscriptions(status);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_period_end on public.subscriptions(current_period_end);
 
 -- Auditoría de cambios en suscripciones. Inmutable.
 create type subscription_event_type as enum (
@@ -107,7 +107,7 @@ create table public.subscription_events (
   created_at timestamptz not null default now()
 );
 
-create index idx_sub_events_subscription on public.subscription_events(subscription_id, created_at desc);
+CREATE INDEX IF NOT EXISTS idx_sub_events_subscription on public.subscription_events(subscription_id, created_at desc);
 
 -- Super admins (tú y tu equipo). Tabla aparte de provider_accounts.
 create table public.super_admins (
@@ -151,9 +151,9 @@ create table public.clients (
   unique (provider_account_id, auth_user_id)
 );
 
-create index idx_clients_provider on public.clients(provider_account_id);
-create index idx_clients_auth_user on public.clients(auth_user_id) where auth_user_id is not null;
-create index idx_clients_phone on public.clients(provider_account_id, phone);
+CREATE INDEX IF NOT EXISTS idx_clients_provider on public.clients(provider_account_id);
+CREATE INDEX IF NOT EXISTS idx_clients_auth_user on public.clients(auth_user_id) where auth_user_id is not null;
+CREATE INDEX IF NOT EXISTS idx_clients_phone on public.clients(provider_account_id, phone);
 
 -- ============================================================================
 -- 3. CATÁLOGO DE SERVICIOS
@@ -175,7 +175,7 @@ create table public.services (
   updated_at timestamptz not null default now()
 );
 
-create index idx_services_provider_active on public.services(provider_account_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_services_provider_active on public.services(provider_account_id, is_active);
 
 -- ============================================================================
 -- 4. DISPONIBILIDAD DEL PROFESIONAL
@@ -194,7 +194,7 @@ create table public.weekly_availability (
   created_at timestamptz not null default now()
 );
 
-create index idx_weekly_availability_provider on public.weekly_availability(provider_account_id, day_of_week)
+CREATE INDEX IF NOT EXISTS idx_weekly_availability_provider on public.weekly_availability(provider_account_id, day_of_week)
   where is_active = true;
 
 -- Excepciones puntuales: vacaciones, días bloqueados, horas extra
@@ -215,7 +215,7 @@ create table public.availability_overrides (
   check (type = 'blocked' or (start_time is not null and end_time is not null))
 );
 
-create index idx_overrides_provider_date on public.availability_overrides(provider_account_id, override_date);
+CREATE INDEX IF NOT EXISTS idx_overrides_provider_date on public.availability_overrides(provider_account_id, override_date);
 
 -- ============================================================================
 -- 5. CITAS (el corazón del sistema)
@@ -265,11 +265,11 @@ create table public.appointments (
   updated_at timestamptz not null default now()
 );
 
-create index idx_appointments_provider_start on public.appointments(provider_account_id, scheduled_start);
-create index idx_appointments_client on public.appointments(client_id, scheduled_start desc);
-create index idx_appointments_status on public.appointments(status, approval_deadline)
+CREATE INDEX IF NOT EXISTS idx_appointments_provider_start on public.appointments(provider_account_id, scheduled_start);
+CREATE INDEX IF NOT EXISTS idx_appointments_client on public.appointments(client_id, scheduled_start desc);
+CREATE INDEX IF NOT EXISTS idx_appointments_status on public.appointments(status, approval_deadline)
   where status in ('pending_provider_approval', 'pending_client_approval');
-create index idx_appointments_upcoming on public.appointments(provider_account_id, scheduled_start)
+CREATE INDEX IF NOT EXISTS idx_appointments_upcoming on public.appointments(provider_account_id, scheduled_start)
   where status in ('confirmed', 'pending_provider_approval', 'pending_client_approval');
 
 -- Constraint crítico: no se solapan dos citas activas del mismo proveedor.
@@ -296,7 +296,7 @@ create table public.appointment_services (
   created_at timestamptz not null default now()
 );
 
-create index idx_appt_services_appointment on public.appointment_services(appointment_id);
+CREATE INDEX IF NOT EXISTS idx_appt_services_appointment on public.appointment_services(appointment_id);
 
 -- Auditoría inmutable de cambios de estado de la cita.
 create table public.appointment_history (
@@ -312,7 +312,7 @@ create table public.appointment_history (
   created_at timestamptz not null default now()
 );
 
-create index idx_appt_history_appointment on public.appointment_history(appointment_id, created_at desc);
+CREATE INDEX IF NOT EXISTS idx_appt_history_appointment on public.appointment_history(appointment_id, created_at desc);
 
 -- ============================================================================
 -- 6. LISTA DE ESPERA
@@ -348,9 +348,9 @@ create table public.waitlist_entries (
   updated_at timestamptz not null default now()
 );
 
-create index idx_waitlist_provider_date on public.waitlist_entries(provider_account_id, desired_date)
+CREATE INDEX IF NOT EXISTS idx_waitlist_provider_date on public.waitlist_entries(provider_account_id, desired_date)
   where status = 'waiting';
-create index idx_waitlist_notified on public.waitlist_entries(notification_expires_at)
+CREATE INDEX IF NOT EXISTS idx_waitlist_notified on public.waitlist_entries(notification_expires_at)
   where status = 'notified';
 
 -- ============================================================================
@@ -369,7 +369,7 @@ create table public.reviews (
   created_at timestamptz not null default now()
 );
 
-create index idx_reviews_provider on public.reviews(provider_account_id, created_at desc);
+CREATE INDEX IF NOT EXISTS idx_reviews_provider on public.reviews(provider_account_id, created_at desc);
 
 -- ============================================================================
 -- 8. NOTIFICACIONES
@@ -407,8 +407,8 @@ create table public.notifications (
   created_at timestamptz not null default now()
 );
 
-create index idx_notifications_recipient on public.notifications(recipient_user_id, created_at desc);
-create index idx_notifications_unread on public.notifications(recipient_user_id) where read_at is null;
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient on public.notifications(recipient_user_id, created_at desc);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread on public.notifications(recipient_user_id) where read_at is null;
 
 -- Suscripciones a Web Push (un usuario puede tener varias, una por dispositivo)
 create table public.push_subscriptions (
@@ -424,7 +424,7 @@ create table public.push_subscriptions (
   last_used_at timestamptz not null default now()
 );
 
-create index idx_push_subscriptions_user on public.push_subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user on public.push_subscriptions(user_id);
 
 -- ============================================================================
 -- 9. TRIGGERS DE AUDITORÍA Y UTILIDAD
@@ -849,3 +849,5 @@ select cron.schedule(
 -- ============================================================================
 -- FIN DEL MIGRATION INICIAL
 -- ============================================================================
+
+

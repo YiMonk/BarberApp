@@ -35,7 +35,7 @@ alter table public.provider_accounts add column if not exists whatsapp_reminder_
 alter table public.provider_accounts add constraint coordinates_both_or_none
   check ((latitude is null and longitude is null) or (latitude is not null and longitude is not null));
 
-create index if not exists idx_provider_accounts_public on public.provider_accounts(is_profile_public)
+CREATE INDEX IF NOT EXISTS idx_provider_accounts_public on public.provider_accounts(is_profile_public)
   where is_profile_public = true and onboarding_completed = true and is_active = true;
 
 -- ----------------------------------------------------------------------------
@@ -101,11 +101,11 @@ create table public.appointment_invitations (
   updated_at timestamptz not null default now()
 );
 
-create index idx_invitations_token on public.appointment_invitations(token);
-create index idx_invitations_provider on public.appointment_invitations(provider_account_id, created_at desc);
-create index idx_invitations_status_expires on public.appointment_invitations(status, expires_at)
+CREATE INDEX IF NOT EXISTS idx_invitations_token on public.appointment_invitations(token);
+CREATE INDEX IF NOT EXISTS idx_invitations_provider on public.appointment_invitations(provider_account_id, created_at desc);
+CREATE INDEX IF NOT EXISTS idx_invitations_status_expires on public.appointment_invitations(status, expires_at)
   where status in ('pending', 'opened');
-create index idx_invitations_client on public.appointment_invitations(client_id);
+CREATE INDEX IF NOT EXISTS idx_invitations_client on public.appointment_invitations(client_id);
 
 create trigger trg_invitations_updated before update on public.appointment_invitations
   for each row execute function public.set_updated_at();
@@ -155,9 +155,9 @@ create table public.reminder_tasks (
   updated_at timestamptz not null default now()
 );
 
-create index idx_reminder_tasks_provider_pending on public.reminder_tasks(provider_account_id, due_at)
+CREATE INDEX IF NOT EXISTS idx_reminder_tasks_provider_pending on public.reminder_tasks(provider_account_id, due_at)
   where status = 'pending';
-create index idx_reminder_tasks_appointment on public.reminder_tasks(appointment_id);
+CREATE INDEX IF NOT EXISTS idx_reminder_tasks_appointment on public.reminder_tasks(appointment_id);
 
 create trigger trg_reminder_tasks_updated before update on public.reminder_tasks
   for each row execute function public.set_updated_at();
@@ -368,3 +368,5 @@ select cron.schedule(
 -- ============================================================================
 -- FIN MIGRATION 002
 -- ============================================================================
+
+

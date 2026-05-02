@@ -47,10 +47,10 @@ create table public.client_profiles (
   updated_at timestamptz not null default now()
 );
 
-create index idx_client_profiles_auth_user on public.client_profiles(auth_user_id) where auth_user_id is not null;
-create index idx_client_profiles_phone on public.client_profiles(phone) where phone is not null;
-create index idx_client_profiles_email on public.client_profiles(email) where email is not null;
-create index idx_client_profiles_birth_month on public.client_profiles(extract(month from birth_date)) where birth_date is not null;
+CREATE INDEX IF NOT EXISTS idx_client_profiles_auth_user on public.client_profiles(auth_user_id) where auth_user_id is not null;
+CREATE INDEX IF NOT EXISTS idx_client_profiles_phone on public.client_profiles(phone) where phone is not null;
+CREATE INDEX IF NOT EXISTS idx_client_profiles_email on public.client_profiles(email) where email is not null;
+CREATE INDEX IF NOT EXISTS idx_client_profiles_birth_month on public.client_profiles(extract(month from birth_date)) where birth_date is not null;
 
 create trigger trg_client_profiles_updated before update on public.client_profiles
   for each row execute function public.set_updated_at();
@@ -86,8 +86,8 @@ create table public.client_provider_links (
   unique (client_profile_id, provider_account_id)
 );
 
-create index idx_cpl_client on public.client_provider_links(client_profile_id);
-create index idx_cpl_provider on public.client_provider_links(provider_account_id);
+CREATE INDEX IF NOT EXISTS idx_cpl_client on public.client_provider_links(client_profile_id);
+CREATE INDEX IF NOT EXISTS idx_cpl_provider on public.client_provider_links(provider_account_id);
 
 create trigger trg_cpl_updated before update on public.client_provider_links
   for each row execute function public.set_updated_at();
@@ -227,10 +227,10 @@ create table public.loyalty_programs (
   updated_at timestamptz not null default now()
 );
 
-create index idx_loyalty_programs_provider on public.loyalty_programs(provider_account_id);
-create index idx_loyalty_programs_active on public.loyalty_programs(provider_account_id, is_active)
+CREATE INDEX IF NOT EXISTS idx_loyalty_programs_provider on public.loyalty_programs(provider_account_id);
+CREATE INDEX IF NOT EXISTS idx_loyalty_programs_active on public.loyalty_programs(provider_account_id, is_active)
   where is_active = true;
-create index idx_loyalty_programs_mechanic on public.loyalty_programs(provider_account_id, mechanic);
+CREATE INDEX IF NOT EXISTS idx_loyalty_programs_mechanic on public.loyalty_programs(provider_account_id, mechanic);
 
 create trigger trg_loyalty_programs_updated before update on public.loyalty_programs
   for each row execute function public.set_updated_at();
@@ -258,8 +258,8 @@ create table public.loyalty_progress (
   unique (loyalty_program_id, client_provider_link_id)
 );
 
-create index idx_loyalty_progress_link on public.loyalty_progress(client_provider_link_id);
-create index idx_loyalty_progress_program on public.loyalty_progress(loyalty_program_id);
+CREATE INDEX IF NOT EXISTS idx_loyalty_progress_link on public.loyalty_progress(client_provider_link_id);
+CREATE INDEX IF NOT EXISTS idx_loyalty_progress_program on public.loyalty_progress(loyalty_program_id);
 
 create trigger trg_loyalty_progress_updated before update on public.loyalty_progress
   for each row execute function public.set_updated_at();
@@ -296,10 +296,10 @@ create table public.loyalty_rewards (
   created_at timestamptz not null default now()
 );
 
-create index idx_rewards_link_available on public.loyalty_rewards(client_provider_link_id, status)
+CREATE INDEX IF NOT EXISTS idx_rewards_link_available on public.loyalty_rewards(client_provider_link_id, status)
   where status = 'available';
-create index idx_rewards_program on public.loyalty_rewards(loyalty_program_id);
-create index idx_rewards_appointment on public.loyalty_rewards(applied_to_appointment_id)
+CREATE INDEX IF NOT EXISTS idx_rewards_program on public.loyalty_rewards(loyalty_program_id);
+CREATE INDEX IF NOT EXISTS idx_rewards_appointment on public.loyalty_rewards(applied_to_appointment_id)
   where applied_to_appointment_id is not null;
 
 -- Cuando una cita se aplica una recompensa, registrar la relación en appointments
@@ -320,8 +320,8 @@ create table public.favorite_providers (
   unique (client_profile_id, provider_account_id)
 );
 
-create index idx_favorites_client on public.favorite_providers(client_profile_id);
-create index idx_favorites_provider on public.favorite_providers(provider_account_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_client on public.favorite_providers(client_profile_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_provider on public.favorite_providers(provider_account_id);
 
 -- ============================================================================
 -- PARTE 6: TRIGGER QUE ACTUALIZA PROGRESO Y STATS AL ATENDERSE UNA CITA
@@ -632,3 +632,5 @@ select cron.schedule(
 -- ============================================================================
 -- FIN MIGRATION 003
 -- ============================================================================
+
+
